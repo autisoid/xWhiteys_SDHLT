@@ -566,14 +566,15 @@ static void     LogArgs(int argc, char** argv)
 // =====================================================================================
 void            Banner()
 {
-    Log("%s " SDHLT_VERSIONSTRING
+    Log("%s " XWHTHLT_VERSIONSTRING " (SDHLT: " SDHLT_VERSIONSTRING ")"
 #ifndef VERSION_32BIT
 		" " PLATFORM_VERSIONSTRING
 #endif
 		" (%s)\n", g_Program, __DATE__);
     //Log("BUGGY %s (built: %s)\nUse at own risk.\n", g_Program, __DATE__);
 
-    Log("seedee's Half-Life Compilation Tools\n"
+	Log("xWhitey's seedee's Half-Life Compilation Tools\n"
+        "Based on code modifications by Seedee.\n"
         "Based on code modifications by Sean 'Zoner' Cavanaugh and Vluzacn\n"
         "Based on Valve's version, modified with permission.\n"
         MODIFICATIONS_STRING);

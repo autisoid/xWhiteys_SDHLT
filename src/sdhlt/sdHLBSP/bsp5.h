@@ -84,7 +84,8 @@ typedef struct face_s                                      // This structure is 
     int             planenum;
     int             texturenum;
     int             contents;                              // contents in front of face
-	int				detaillevel; // defined by hlcsg
+	int             detaillevel; // defined by hlcsg
+    int             dontcut;     // defined by hlcsg
 	int				*outputedges; // used in WriteDrawNodes
 
     struct face_s*  original;                              // face on node
@@ -95,7 +96,6 @@ typedef struct face_s                                      // This structure is 
 
     // vector quad word aligned
     vec3_t          pts[MAXEDGES];                         // FIXME: change to use winding_t
-
 }
 face_t;
 

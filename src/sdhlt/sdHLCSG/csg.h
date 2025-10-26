@@ -57,6 +57,7 @@
 #define DEFAULT_NOUTF8 false
 #endif
 #define DEFAULT_NULLIFYTRIGGER true
+#define DEFAULT_DONTFIXUPLIQUIDSCHECK false
 
 // AJM: added in
 #define UNLESS(a)  if (!(a))
@@ -160,6 +161,7 @@ typedef struct brush_s
 	int				detaillevel;
 	int				chopdown; // allow this brush to chop brushes of lower detail level
 	int				chopup; // allow this brush to be chopped by brushes of higher detail level
+    bool            dontcut; // don't allow this brush to cut other brushes' faces
 	int				clipnodedetaillevel;
 	int				coplanarpriority;
 	char *			hullshapes[NUM_HULLS]; // might be NULL
@@ -281,6 +283,7 @@ extern bool g_nolightopt;
 extern bool g_noutf8;
 #endif
 extern bool g_nullifytrigger;
+extern bool g_dontfixupliquidscheck;
 
 extern vec_t    g_tiny_threshold;
 extern vec_t    g_BrushUnionThreshold;

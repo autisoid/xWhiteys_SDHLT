@@ -212,6 +212,7 @@ face_t*         NewFaceFromFace(const face_t* const in)
     newf->contents = in->contents;
 	newf->facestyle = in->facestyle;
 	newf->detaillevel = in->detaillevel;
+    newf->dontcut = in->dontcut;
 
     return newf;
 }
@@ -266,7 +267,7 @@ static void     SplitFaceTmp(face_t* in, const dplane_t* const split, face_t** f
 
 	if (!counts[0] && !counts[1])
 	{
-		if (in->detaillevel)
+		if (in->detaillevel || in->dontcut)
 		{
 			// put front face in front node, and back face in back node.
 			const dplane_t *faceplane = &g_dplanes[in->planenum];
@@ -960,53 +961,54 @@ static surfchain_t* ReadSurfs(FILE* file)
 {
     int             r;
 	int				detaillevel;
-    int             planenum, g_texinfo, contents, numpoints;
+    int             planenum = 0, g_texinfo = 0, contents = 0, numpoints = 0, dontcut = 0;
     face_t*         f;
     int             i;
     double          v[3];
     int             line = 0;
 	double			inaccuracy, inaccuracy_count = 0.0, inaccuracy_total = 0.0, inaccuracy_max = 0.0;
+    int             hullnum = (file == polyfiles[0] ? 0 : file == polyfiles[1] ? 1 : file == polyfiles[2] ? 2 : file == polyfiles[3] ? 3 : -1);
 
     // read in the polygons
     while (1)
     {
-		if (file == polyfiles[2] && g_nohull2)
-			break;
+        if (file == polyfiles[2] && g_nohull2)
+            break;
         line++;
-        r = fscanf(file, "%i %i %i %i %i\n", &detaillevel, &planenum, &g_texinfo, &contents, &numpoints);
+        r = fscanf(file, "%i %i %i %i %u %i\n", &detaillevel, &planenum, &g_texinfo, &contents, &numpoints, &dontcut);
         if (r == 0 || r == -1)
         {
             return NULL;
         }
         if (planenum == -1)                                // end of model
         {
-			Developer (DEVELOPER_LEVEL_MEGASPAM, "inaccuracy: average %.8f max %.8f\n", inaccuracy_total / inaccuracy_count, inaccuracy_max);
+            Developer(DEVELOPER_LEVEL_MEGASPAM, "inaccuracy: average %.8f max %.8f\n", inaccuracy_total / inaccuracy_count, inaccuracy_max);
             break;
         }
-		if (r != 5)
+        if (r != 6)
         {
-            Error("ReadSurfs (line %i): scanf failure", line);
+            Error("ReadSurfs (line %i, hull %i): scanf failure", line, hullnum);
         }
         if (numpoints > MAXPOINTS)
         {
-            Error("ReadSurfs (line %i): %i > MAXPOINTS\nThis is caused by a face with too many verticies (typically found on end-caps of high-poly cylinders)\n", line, numpoints);
+            Error("ReadSurfs (line %i, hull %i): %i > MAXPOINTS\nThis is caused by a face with too many verticies (typically found on end-caps of high-poly cylinders)\n", line, hullnum, numpoints);
         }
         if (planenum > g_numplanes)
         {
-            Error("ReadSurfs (line %i): %i > g_numplanes\n", line, planenum);
+            Error("ReadSurfs (line %i, hull %i): %i > g_numplanes\n", line, hullnum, planenum);
         }
         if (g_texinfo > g_numtexinfo)
         {
-            Error("ReadSurfs (line %i): %i > g_numtexinfo", line, g_texinfo);
+            Error("ReadSurfs (line %i, hull %i): %i > g_numtexinfo", line, hullnum, g_texinfo);
         }
-		if (detaillevel < 0)
-		{
-			Error("ReadSurfs (line %i): detaillevel %i < 0", line, detaillevel);
-		}
+        if (detaillevel < 0)
+        {
+            Error("ReadSurfs (line %i, hull %i): detaillevel %i < 0", line, hullnum, detaillevel);
+        }
 
         if (!strcasecmp(GetTextureByNumber(g_texinfo), "skip"))
         {
-            Verbose("ReadSurfs (line %i): skipping a surface", line);
+            Verbose("ReadSurfs (line %i, hull %i): skipping a surface", line, hullnum);
 
             for (i = 0; i < numpoints; i++)
             {
@@ -1015,7 +1017,7 @@ static surfchain_t* ReadSurfs(FILE* file)
                 r = fscanf(file, "%lf %lf %lf\n", &v[0], &v[1], &v[2]);
                 if (r != 3)
                 {
-                    Error("::ReadSurfs (face_skip), fscanf of points failed at line %i", line);
+                    Error("::ReadSurfs (face_skip), fscanf of points failed at line %i hull %i", line, hullnum);
                 }
             }
             fscanf(file, "\n");
@@ -1023,7 +1025,8 @@ static surfchain_t* ReadSurfs(FILE* file)
         }
 
         f = AllocFace();
-		f->detaillevel = detaillevel;
+        f->dontcut = dontcut;
+        f->detaillevel = detaillevel;
         f->planenum = planenum;
         f->texturenum = g_texinfo;
         f->contents = contents;
@@ -1039,7 +1042,7 @@ static surfchain_t* ReadSurfs(FILE* file)
             r = fscanf(file, "%lf %lf %lf\n", &v[0], &v[1], &v[2]);
             if (r != 3)
             {
-                Error("::ReadSurfs (face_normal), fscanf of points failed at line %i", line);
+                Error("::ReadSurfs (face_normal), fscanf of points failed at line %i hull %i", line, hullnum);
             }
             VectorCopy(v, f->pts[i]);
 			 if (DEVELOPER_LEVEL_MEGASPAM <= g_developer)
@@ -1360,6 +1363,7 @@ static bool     ProcessModel()
 		{
 			ent = NULL;
 		}
+        
 		Warning ("No visible brushes in solid entity: model %d (entity: classname \"%s\", origin \"%s\", targetname \"%s\", range (%.0f,%.0f,%.0f) - (%.0f,%.0f,%.0f))", 
 			g_nummodels - 1, 
 			(ent? ValueForKey (ent, "classname"): "unknown"), 
@@ -1621,7 +1625,7 @@ int             main(const int argc, char** argv)
     double          start, end;
     const char*     mapname_from_arg = NULL;
 
-    g_Program = "sdHLBSP";
+    g_Program = "xwhtSCBSP";
 
 	int argcold = argc;
 	char ** argvold = argv;

@@ -1195,11 +1195,17 @@ static void     LinkLeafFaces(surface_t* planelist, node_t* leafnode)
 				continue;
 			}
 			r = RankForContents(f->contents);
-			if (r != rank)
+			if (r != rank) {
 				break;
+			}
 		}
-		if (f)
+#if 0
+		if (f) {
+			const char* texname = GetTextureByNumber(f->texturenum);
+			Warning("Face ( %s texture, at (%.0f,%.0f,%.0f)-(%.0f,%.0f,%.0f) ) is going to lead to \"Ambiguous leafnode content\"!", texname[0]? texname: "unknown", surf->mins[0], surf->mins[1], surf->mins[2], surf->maxs[0], surf->maxs[1], surf->maxs[2]);
 			break;
+		}
+#endif
 	}
 	if (surf)
 	{

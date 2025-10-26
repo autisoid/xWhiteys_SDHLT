@@ -1,6 +1,13 @@
-![Banner](media/banner.png)
+```
+        _       ____    _ __            _          _____ ____  __  ____  ______
+   _  _| |     / / /_  (_) /____  __  _( )_____   / ___// __ \/ / / / / /_  __/
+  | |/_/ | /| / / __ \/ / __/ _ \/ / / /// ___/   \__ \/ / / / /_/ / /   / /   
+ _>  < | |/ |/ / / / / / /_/  __/ /_/ / (__  )   ___/ / /_/ / __  / /___/ /    
+/_/|_| |__/|__/_/ /_/_/\__/\___/\__, / /____/   /____/_____/_/ /_/_____/_/     
+                               /____/                                          
+```
 
-<sub>Half-Life engine map compile tools, based on Vluzacn's ZHLT v34 with code contributions from various contributors. Based on Valve's version, modified with permission.</sub>
+<sub>Half-Life engine map compile tools, based on SDHLT v1.2.0.</sub>
 
 New features include shadows from studiomodels, new entities, additional tool textures, ability to extend world size limits, portal file optimisation for J.A.C.K. map editor and minor algorithm optimization.
 
@@ -9,6 +16,7 @@ New features include shadows from studiomodels, new entities, additional tool te
 1. Open the configuration dialog of your map editor or batch compiler.
 2. Set CSG, BSP, VIS, RAD tool paths to *sdHLCSG.exe*, *sdHLBSP.exe*, *sdHLVIS.exe*, *sdHLRAD.exe*, use the *_x64.exe* editions if running on 64-bit.  
 3. Add *sdhlt.wad* into your wad list. This is required to compile maps.
+3. Add *xwhtHLT.wad* into your wad list. This is required as well to compile maps.
 4. Add *sdhlt.fgd* into your fgd list.
 
 The main benefit of the 64-bit version is no memory allocation failures, because the 64-bit tools have access to more than 2GB of system memory.
@@ -35,19 +43,51 @@ To implement these into your own fgd file for SmartEdit, use the template at the
 - **BEVELHINT** texture, which acts like **SOLIDHINT** and **BEVEL**. Eliminates unnecessary face subdivision and bevels clipnodes at the same time. Useful on complex shapes such as terrain, spiral staircase clipping, etc.
 - **SPLITFACE** texture. Brushes with this texture will subdivide faces they touch along their edges, similarly to `zhlt_chopdown`.
 - **cur_tool** textures, which act like **CONTENTWATER** and *func_pushable* with a speed of `2048 units/s` in -Y. This texture is always fullbright.
+- **DETAILCUT** texture, acts like **func_detail** but seals the map and blocks VIS. Replaced with **NULL** during the compilation process.
+> [!CAUTION]
+> This very texture produces _more_ clipnodes that just **NULL** so do _NOT_ use it to build brushes!
+- **DETAILCUTLVL** texture family, which acts like **func_detail** fully. They don't seal the map, nor block VIS. Sets **detaillevel** for the brush it's applied on to accordingly to the texture's name.
+- **NOCLIPDETAILCUT** texture, which acts like **DETAILCUT** and **NOCLIP** together.
+- **NCDETAILCUTLVL** texture family, which acts like **DETAILCUTLVL** and **NOCLIP** together.
 
 ### Compile parameters
 
-- `-pre25` RAD parameter overrides light clipping threshold limiter to `188`. Use this when creating maps for the legacy pre-25th anniversary engine without worrying about other parameters.
+- ~~`-pre25` RAD parameter overrides light clipping threshold limiter to `188`. Use this when creating maps for the legacy pre-25th anniversary engine without worrying about other parameters.~~
+- ^ Not anymore. See [this](https://github.com/seedee/SDHLT/issues/29)
 - `-extra` RAD parameter now sets `-bounce 12` for a higher quality of lighting simulation.
 - `-worldextent n` CSG parameter. Extends map geometry limits beyond `+/-32768`.
 - Portal file reformatting for J.A.C.K. map editor, allows for importing the prt file into the editor directly after VIS. Use `-nofixprt` VIS parameter to disable.
 - `-nowadautodetect` CSG parameter. Wadautodetect is now true by default regardless of settings.
 - `-nostudioshadow` RAD parameter to ignore `zhlt_studioshadow` on studiomodels.
+- `-dontfixliquids` CSG parameter. Liquids will have a lightmap if set.
+
+## What is DETAILCUT and where should I use it?
+
+- I attached an example map as `media/___detailcut.rmf` file so you can see better.
+
+Now that you have the `.rmf` file, let's look into this:
+
+<img alt="CORNER_EXAMPLE" src="media/corner_example.png" />
+
+As you can see, I applied the **DETAILCUT** texture (yellow "D" letter on black background) to the top of the "corner" brushes "hidden" in a room.
+
+This is how it looks in-game when standing outside (gl_wireframe 2):
+
+<img alt="INGAME_OUTSIDE_THE_CORNER" src="media/ingame_outside_the_corner.jpg" />
+
+And now inside (gl_wireframe 2):
+
+<img alt="INGAME_INSIDE_THE_CORNER" src="media/ingame_inside_the_corner.png" />
+
+VIS has blocked the outside area from rendering, but the floor and the ceiling didn't get "cut" (hence the texture name) by CSG.
+
+But the cost of that is weird lighting (look again into the outside screenshot I attached)
+
+- Another example!
+
+<img alt="INGAME_BOXES" src="media/ingame_boxes.png" />
+
+See these nice boxes? They're one single brush entity, but they don't "cut" each other (look into the map source to see why)
 
 ## Planned
-- **BLOCKLIGHT** texture, cast shadows without generating faces or cliphulls.
-- Optimization for `BuildFacelights` and `LeafThread`
-- Res file creation for servers
-- Split concerns into their own libraries instead of repeating infrastructure and util code
-- Full tool texture documentation
+Same as [this](https://github.com/seedee/SDHLT?tab=readme-ov-file#planned) but I don't really plan on implementing this at all.

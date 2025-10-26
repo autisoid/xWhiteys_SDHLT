@@ -28,7 +28,6 @@
  * every surface must be divided into at least two g_patches each axis
  */
 
-bool            g_pre25update = DEFAULT_PRE25UPDATE;
 bool			g_fastmode = DEFAULT_FASTMODE;
 bool g_studioshadow = DEFAULT_STUDIOSHADOW;
 
@@ -2719,7 +2718,6 @@ static void     Usage()
 	Log("    -waddir folder  : Search this folder for wad files.\n");
 	Log("    -fast           : Fast rad\n");
 	Log("    -vismatrix value: Set vismatrix method to normal, sparse or off.\n");
-	Log("    -pre25          : Optimize compile for pre-Half-Life 25th anniversary update.\n");
     Log("    -extra          : Improve lighting quality by doing 9 point oversampling\n");
     Log("    -bounce #       : Set number of radiosity bounces\n");
     Log("    -ambient r g b  : Set ambient world light (0.0 to 1.0, r g b)\n");
@@ -2867,7 +2865,6 @@ static void     Settings()
 		g_method == eMethodVismatrix? "Original": g_method == eMethodSparseVismatrix? "Sparse": g_method == eMethodNoVismatrix? "NoMatrix": "Unknown",
 		DEFAULT_METHOD == eMethodVismatrix? "Original": DEFAULT_METHOD == eMethodSparseVismatrix? "Sparse": DEFAULT_METHOD == eMethodNoVismatrix? "NoMatrix": "Unknown"
 		);
-	Log("pre-25th anniversary [ %17s ] [ %17s ]\n", g_pre25update ? "on" : "off", DEFAULT_PRE25UPDATE ? "on" : "off");
     Log("oversampling (-extra)[ %17s ] [ %17s ]\n", g_extra ? "on" : "off", DEFAULT_EXTRA ? "on" : "off");
     Log("bounces              [ %17d ] [ %17d ]\n", g_numbounce, DEFAULT_BOUNCE);
 
@@ -3222,7 +3219,7 @@ int             main(const int argc, char** argv)
     const char*     user_lights = NULL;
 	char temp[_MAX_PATH]; //seedee
 
-    g_Program = "sdHLRAD";
+    g_Program = "xwhtSCRAD";
 
 	int argcold = argc;
 	char ** argvold = argv;
@@ -3928,11 +3925,6 @@ int             main(const int argc, char** argv)
 			{
 				Usage();
 			}
-		}
-		else if (!strcasecmp(argv[i], "-pre25")) //Pre25 should be after everything else to override
-		{
-			g_pre25update = true;
-            g_limitthreshold = 188.0;
 		}
         else if (argv[i][0] == '-')
         {

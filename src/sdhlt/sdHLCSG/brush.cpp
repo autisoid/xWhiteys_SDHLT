@@ -973,6 +973,10 @@ static contents_t TextureContents(const char* const name)
         return CONTENTS_NULL;
 	if(!strncasecmp(name,"bevel",5))
 		return CONTENTS_NULL;
+	if (!strncasecmp(name, "detailcut", 9))
+		return CONTENTS_NULL;
+	if (!strncasecmp(name, "noclipdetailcut", 15))
+		return CONTENTS_NULL;
 
     return CONTENTS_SOLID;
 }

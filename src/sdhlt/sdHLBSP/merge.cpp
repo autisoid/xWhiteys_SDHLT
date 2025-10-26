@@ -15,14 +15,14 @@
 //      Returns NULL if the faces couldn't be merged, or the new face.
 //      The originals will NOT be freed.
 // =====================================================================================
-static face_t*  TryMerge(face_t* f1, face_t* f2)
+static face_t* TryMerge(face_t* f1, face_t* f2)
 {
-    vec_t*          p1;
-    vec_t*          p2;
-    vec_t*          p3;
-    vec_t*          p4;
-    vec_t*          back;
-    face_t*         newf;
+    vec_t* p1;
+    vec_t* p2;
+    vec_t* p3;
+    vec_t* p4;
+    vec_t* back;
+    face_t* newf;
     int             i;
     int             j;
     int             k;
@@ -31,14 +31,14 @@ static face_t*  TryMerge(face_t* f1, face_t* f2)
     vec3_t          delta;
     vec3_t          planenormal;
     vec_t           dot;
-    dplane_t*       plane;
+    dplane_t* plane;
     bool            keep1;
     bool            keep2;
 
     if (f1->numpoints == -1 || f2->numpoints == -1)
     {
         return NULL;
-    }    
+    }
     if (f1->texturenum != f2->texturenum)
     {
         return NULL;
@@ -47,18 +47,22 @@ static face_t*  TryMerge(face_t* f1, face_t* f2)
     {
         return NULL;
     }
-	if (f1->planenum != f2->planenum)
-	{
-		return NULL;
-	}
-	if (f1->facestyle != f2->facestyle)
-	{
-		return NULL;
-	}
-	if (f1->detaillevel != f2->detaillevel)
-	{
-		return NULL;
-	}
+    if (f1->planenum != f2->planenum)
+    {
+        return NULL;
+    }
+    if (f1->facestyle != f2->facestyle)
+    {
+        return NULL;
+    }
+    if (f1->detaillevel != f2->detaillevel)
+    {
+        return NULL;
+    }
+    if (f1->dontcut != f2->dontcut)
+    {
+        return NULL;
+    }
 
     //
     // find a common edge

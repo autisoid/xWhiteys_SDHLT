@@ -1433,7 +1433,7 @@ int             main(const int argc, char** argv)
 #ifdef ZHLT_NETVIS
     g_Program = "netvis";
 #else
-    g_Program = "sdHLVIS";
+    g_Program = "xwhtSCVIS";
 #endif
 
 	int argcold = argc;

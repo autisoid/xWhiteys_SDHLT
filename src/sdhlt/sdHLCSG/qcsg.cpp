@@ -69,6 +69,7 @@ bool g_nolightopt = DEFAULT_NOLIGHTOPT;
 bool g_noutf8 = DEFAULT_NOUTF8;
 #endif
 bool g_nullifytrigger = DEFAULT_NULLIFYTRIGGER;
+bool g_dontfixupliquidscheck = DEFAULT_DONTFIXUPLIQUIDSCHECK;
 bool g_viewsurface = false;
 
 // =====================================================================================
@@ -289,7 +290,8 @@ void            FreeFace(bface_t* f)
 // =====================================================================================
 void            WriteFace(const int hull, const bface_t* const f
 						  , int detaillevel
-						  )
+                          , int dontcut
+                          )
 {
     unsigned int    i;
     Winding*        w;
@@ -302,7 +304,7 @@ void            WriteFace(const int hull, const bface_t* const f
     w = f->w;
 
     // plane summary
-	fprintf (out[hull], "%i %i %i %i %u\n", detaillevel, f->planenum, f->texinfo, f->contents, w->m_NumPoints);
+	fprintf (out[hull], "%i %i %i %i %u %i\n", detaillevel, f->planenum, f->texinfo, f->contents, w->m_NumPoints, dontcut);
 
     // for each of the points on the face
     for (i = 0; i < w->m_NumPoints; i++)
@@ -510,7 +512,9 @@ static void     SaveOutside(const brush_t* const b, const int hull, bface_t* out
         WriteFace(hull, f
 			, 
 			(hull? b->clipnodedetaillevel: b->detaillevel)
-			);
+            ,
+            b->dontcut
+            );
 
         //              if (mirrorcontents != CONTENTS_SOLID)
         {
@@ -529,7 +533,9 @@ static void     SaveOutside(const brush_t* const b, const int hull, bface_t* out
             WriteFace(hull, f
 				, 
 				(hull? b->clipnodedetaillevel: b->detaillevel)
-				);
+                ,
+                b->dontcut
+                );
         }
 
         FreeFace(f);
@@ -718,7 +724,9 @@ static void     CSGBrush(int brushnum)
 			}
 
             if (!bh2->faces)
-                continue;                                  // brush isn't in this hull
+				continue;                                  // brush isn't in this hull
+            if (b1->dontcut || b2->dontcut)
+                continue; // you can't chop but vis
 
             // check brush bounding box first
             // TODO: use boundingbox method instead
@@ -752,8 +760,7 @@ static void     CSGBrush(int brushnum)
                         || !strncasecmp(texname, "SKIP", 4)
                         || !strncasecmp(texname, "HINT", 4)
                         || !strncasecmp(texname, "SOLIDHINT", 9)
-                        || !strncasecmp(texname, "BEVELHINT", 9)
-                        )
+                        || !strncasecmp(texname, "BEVELHINT", 9))
 					{
 						// should not nullify the fragment inside detail brush
 						f->next = outside;
@@ -1438,7 +1445,7 @@ static void     ProcessModels()
         // write end of model marker
         for (j = 0; j < NUM_HULLS; j++)
         {
-			fprintf (out[j], "-1 -1 -1 -1 -1\n");
+			fprintf (out[j], "-1 -1 -1 -1 -1 -1\n");
 			fprintf (out_detailbrush[j], "-1\n");
         }
     }
@@ -1560,6 +1567,8 @@ static void     Usage()
 #ifdef HLCSG_GAMETEXTMESSAGE_UTF8
 	Log("    -notextconvert   : don't convert game_text message from Windows ANSI to UTF8 format\n");
 #endif
+
+    Log("    -dontfixliquids  : don't fixup broken liquids check in TexinfoForBrushTexture. Adding this to cmdline results in liquids having a lightmap.\n");
 
     Log("    -dev #           : compile with developer message\n\n");
 
@@ -1723,7 +1732,7 @@ int             main(const int argc, char** argv)
     double          start, end;                 // start/end time log
     const char*     mapname_from_arg = NULL;    // mapname path from passed argvar
 
-    g_Program = "sdHLCSG";
+    g_Program = "xwhtSCCSG";
 
 	int argcold = argc;
 	char ** argvold = argv;
@@ -1740,7 +1749,8 @@ int             main(const int argc, char** argv)
     // Hard coded list of -wadinclude files, used for HINT texture brushes so lazy
     // mapmakers wont cause beta testers (or possibly end users) to get a wad 
     // error on zhlt.wad etc
-    g_WadInclude.push_back("sdhlt.wad"); //seedee
+	g_WadInclude.push_back("sdhlt.wad"); //seedee
+	g_WadInclude.push_back("xwhtHLT.wad"); //xWhitey
 
 	InitDefaultHulls ();
 
@@ -2046,6 +2056,10 @@ int             main(const int argc, char** argv)
 		{
 			g_nullifytrigger = false;
 		}
+        else if (!strcasecmp (argv[i], "-dontfixliquids"))
+        {
+            g_dontfixupliquidscheck = true;
+        }
         else if (argv[i][0] == '-')
         {
             Log("Unknown option \"%s\"\n", argv[i]);

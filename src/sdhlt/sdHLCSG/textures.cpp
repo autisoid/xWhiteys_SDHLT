@@ -805,18 +805,19 @@ int             TexinfoForBrushTexture(const plane_t* const plane, brush_texture
 	FindMiptex (bt->name);
 
     // set the special flag
-    if (bt->name[0] == '*'
+    if (g_dontfixupliquidscheck? (bt->name[0] == '*'): (bt->name[0] == '!')
         || !strncasecmp(bt->name, "sky", 3)
 
 // =====================================================================================
 //Cpt_Andrew - Env_Sky Check
 // =====================================================================================
-        || !strncasecmp(bt->name, "env_sky", 5)
+        || !strncasecmp(bt->name, "env_sky", 7)
 // =====================================================================================
 
         || !strncasecmp(bt->name, "origin", 6)
         || !strncasecmp(bt->name, "null", 4)
         || !strncasecmp(bt->name, "aaatrigger", 10)
+        || !strncasecmp(bt->name, "cliphulltrigger", 15)
        )
     {
 		// actually only 'sky' and 'aaatrigger' needs this. --vluzacn

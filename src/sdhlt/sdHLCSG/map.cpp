@@ -163,6 +163,7 @@ static void ParseBrush(entity_t* mapent)
     b->entitynum = g_numentities - 1; //Set brush entity number to last created entity
     b->brushnum = g_nummapbrushes - mapent->firstbrush - 1; //Calculate the brush number within the current entity.
     b->noclip = 0; //Initialize false for now
+	b->dontcut = 0; //Initialize false for now
 
 	if (IntForKey(mapent, "zhlt_noclip")) //If zhlt_noclip
 	{
@@ -270,7 +271,7 @@ static void ParseBrush(entity_t* mapent)
         GetToken(false);
         _strupr(g_token);
 		{ //Check for tool textures on the brush
-			if (!strncasecmp (g_token, "NOCLIP", 6) || !strncasecmp (g_token, "NULLNOCLIP", 10))
+			if ((!strncasecmp (g_token, "NOCLIP", 6) || !strncasecmp (g_token, "NULLNOCLIP", 10)) && strncasecmp(g_token, "NOCLIPDETAILCUT", 15))
 			{
 				strcpy (g_token, "NULL");
 				b->noclip = true;
@@ -289,7 +290,42 @@ static void ParseBrush(entity_t* mapent)
 			{
 				side->bevel = true;
 			}
-			if (!strncasecmp (g_token, "CLIP", 4))
+			if (!strncasecmp(g_token, "DETAILCUT", 9))
+			{
+				strcpy(g_token, "NULL");
+				if (!strncasecmp(g_token, "DETAILCUTLVL", 12)) {
+					int h = atoi(&g_token[12]);
+					if (h < 0) {
+						Error("Invalid DETAILCUTLVL specified on Entity %i, Brush %i, Side %i: h is %d, expected h >= 0\n", b->originalentitynum, b->originalbrushnum,
+							b->numsides, h);
+					}
+					b->detaillevel = h;
+				} else {
+					b->dontcut = true;
+				}
+			}
+			if (!strncasecmp(g_token, "NOCLIPDETAILCUT", 15))
+			{
+				strcpy(g_token, "NULL");
+				b->noclip = true;
+				b->dontcut = true;
+			}
+			if (!strncasecmp(g_token, "NCDETAILCUTLVL", 15)) {
+				strcpy(g_token, "NULL");
+				int h = atoi(&g_token[15]);
+				if (h < 0) {
+					Error("Invalid NCDETAILCUTLVL specified on Entity %i, Brush %i, Side %i: h is %d, expected h >= 0\n", b->originalentitynum, b->originalbrushnum,
+						b->numsides, h);
+				}
+				b->detaillevel = h;
+				b->noclip = true;
+			}
+			if (!strncasecmp(g_token, "CLIPHULLTRIGGER", 15))
+			{
+				b->cliphull |= (1 << 1); //standing
+				b->cliphull |= (1 << 3); //head (crouched)
+			}
+			if (!strncasecmp(g_token, "CLIP", 4) && strncasecmp(g_token, "CLIPHULLTRIGGER", 15))
 			{
 				b->cliphull |= (1 << NUM_HULLS); // arbitrary nonexistent hull
 				int h;
@@ -491,7 +527,7 @@ static void ParseBrush(entity_t* mapent)
 		for (j = 0; j < b->numsides; j++)
 		{
 			side = &g_brushsides[b->firstside + j];
-			if (!strncasecmp (side->td.name, "AAATRIGGER", 10))
+			if (!strncasecmp (side->td.name, "AAATRIGGER", 10) || !strncasecmp(side->td.name, "CLIPHULLTRIGGER", 15))
 			{
 				strcpy (side->td.name, "NULL");
 			}
@@ -931,8 +967,8 @@ bool            ParseMapEntity()
 	if (this_entity == 0)
 	{
 		// Let the map tell which version of the compiler it comes from, to help tracing compiler bugs.
-		char versionstring [128];
-		sprintf (versionstring, "ZHLT " ZHLT_VERSIONSTRING " " HACK_VERSIONSTRING " (%s)", __DATE__);
+		char versionstring [512];
+		sprintf (versionstring, "xWhitey's SDHLT (SDHLT: " SDHLT_VERSIONSTRING ", xwhtHLT: " XWHTHLT_VERSIONSTRING "), based on VHLT (" HACK_VERSIONSTRING ") and ZHLT (" ZHLT_VERSIONSTRING ") (Build date: %s)", __DATE__);
 		SetKeyValue (mapent, "compiler", versionstring);
 	}
     
@@ -1001,7 +1037,7 @@ bool            ParseMapEntity()
 		DeleteCurrentEntity (mapent);
 		return true;
 	}
-	if (fabs (mapent->origin[0]) > ENGINE_ENTITY_RANGE + ON_EPSILON ||
+	/*if (fabs(mapent->origin[0]) > ENGINE_ENTITY_RANGE + ON_EPSILON ||
 		fabs (mapent->origin[1]) > ENGINE_ENTITY_RANGE + ON_EPSILON ||
 		fabs (mapent->origin[2]) > ENGINE_ENTITY_RANGE + ON_EPSILON )
 	{
@@ -1012,7 +1048,7 @@ bool            ParseMapEntity()
 				g_numparsedentities, 
 				classname, (double)ENGINE_ENTITY_RANGE, mapent->origin[0], mapent->origin[1], mapent->origin[2]);
 		}
-	}
+	}*/
     return true;
 }
 

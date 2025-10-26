@@ -161,7 +161,7 @@ typedef struct
 	int		numattachments;	// queryable attachable points
 	int		attachmentindex;
 
-#if defined (HLCSG) || defined (HLBSP) || defined (HLVIS) || defined (HLRAD) 
+#if defined (SDHLCSG) || defined (SDHLBSP) || defined (SDHLVIS) || defined (SDHLRAD) 
 	int		soundtable;
 	int		soundindex;
 #else

@@ -11,7 +11,7 @@
 #define MAX_MAP_HULLS            4
 // hard limit
 
-#define MAX_MAP_MODELS         512 //400 //vluzacn
+#define MAX_MAP_MODELS         4096 //512 //400 //vluzacn
 // variable, but 400 brush entities is very stressful on the engine and network code as it is
 
 #define MAX_MAP_BRUSHES       32768
@@ -24,7 +24,7 @@
 #define MAX_MAP_ENTSTRING   (2048*1024) //(512*1024) //vluzacn
 // abitrary, 512Kb of string data should be plenty even with TFC FGD's
 
-#define MAX_MAP_PLANES      32768 // TODO: This can be larger, because although faces can only use plane 0~32767, clipnodes can use plane 0-65535. --vluzacn
+#define MAX_MAP_PLANES      65535 // TODO: This can be larger, because although faces can only use plane 0~32767, clipnodes can use plane 0-65535. --vluzacn
 #define MAX_INTERNAL_MAP_PLANES (256*1024)
 // (from email): I have been building a rather complicated map, and using your latest 
 // tools (1.61) it seemed to compile fine.  However, in game, the engine was dropping
@@ -38,15 +38,15 @@
 #define MAX_MAP_CLIPNODES    32767
 // hard limit (negative short's are used as contents values)
 
-#define MAX_MAP_LEAFS        32760
-#define MAX_MAP_LEAFS_ENGINE 8192
+#define MAX_MAP_LEAFS        65536
+#define MAX_MAP_LEAFS_ENGINE 65536
 // No problem has been observed in testmap or reported, except when viewing the map from outside (some leafs missing, no crash).
 // This problem indicates that engine's MAX_MAP_LEAFS is 8192 (for reason, see: Quake - gl_model.c - Mod_Init).
 // I don't know if visleafs > 8192 will cause Mod_DecompressVis overflow.
 
 #define MAX_MAP_VERTS        65535
 #define MAX_MAP_FACES        65535 // This ought to be 32768, otherwise faces(in world) can become invisible. --vluzacn
-#define MAX_MAP_WORLDFACES   32768
+#define MAX_MAP_WORLDFACES   65535
 #define MAX_MAP_MARKSURFACES 65535
 // hard limit (data structures store them as unsigned shorts)
 
