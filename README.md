@@ -45,7 +45,7 @@ To implement these into your own fgd file for SmartEdit, use the template at the
 - **cur_tool** textures, which act like **CONTENTWATER** and *func_pushable* with a speed of `2048 units/s` in -Y. This texture is always fullbright.
 - **DETAILCUT** texture, acts like **func_detail** but seals the map and blocks VIS. Replaced with **NULL** during the compilation process.
 > [!CAUTION]
-> This very texture produces _more_ clipnodes that just **NULL** so do _NOT_ use it to build brushes!
+> This very texture produces _more_ clipnodes than just **NULL** so do _NOT_ use it to build brushes!
 - **DETAILCUTLVL** texture family, which acts like **func_detail** fully. They don't seal the map, nor block VIS. Sets **detaillevel** for the brush it's applied on to accordingly to the texture's name.
 - **NOCLIPDETAILCUT** texture, which acts like **DETAILCUT** and **NOCLIP** together.
 - **NCDETAILCUTLVL** texture family, which acts like **DETAILCUTLVL** and **NOCLIP** together.
