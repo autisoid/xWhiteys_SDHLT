@@ -895,7 +895,7 @@ bool            CheckFaceForHint(const face_t* const f)
 }
 
 // =====================================================================================
-//  CheckFaceForSkipt
+//  CheckFaceForSkip
 //      Returns true if the passed face is facetype skip
 // =====================================================================================
 bool            CheckFaceForSkip(const face_t* const f)

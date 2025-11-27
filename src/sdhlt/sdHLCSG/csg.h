@@ -9,6 +9,7 @@
 #include <deque>
 #include <string>
 #include <map>
+#include <vector>
 
 #include "cmdlib.h"
 #include "messages.h"
@@ -162,6 +163,7 @@ typedef struct brush_s
 	int				chopdown; // allow this brush to chop brushes of lower detail level
 	int				chopup; // allow this brush to be chopped by brushes of higher detail level
     bool            dontcut; // don't allow this brush to cut other brushes' faces
+    bool            waterbrush; // special flag for water, similar to dontcut but it doesn't block vis nor create visportals
 	int				clipnodedetaillevel;
 	int				coplanarpriority;
 	char *			hullshapes[NUM_HULLS]; // might be NULL
@@ -238,6 +240,12 @@ extern void     LoadMapFile(const char* const filename);
 
 typedef std::deque< std::string >::iterator WadInclude_i;
 extern std::deque< std::string > g_WadInclude;  // List of substrings to wadinclude
+typedef struct
+{
+	std::string original;
+	std::string replacement;
+} WadReplace_t;
+extern std::vector< WadReplace_t > g_WadReplace;  // --xWhitey
 
 extern void     WriteMiptex();
 extern void     LogWadUsage(wadpath_t* currentwad, int nummiptex);

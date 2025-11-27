@@ -1334,7 +1334,7 @@ static void     CheckForNoClip()
         spawnflags = atoi(ValueForKey(ent, "spawnflags"));
 		int skin = IntForKey(ent, "skin"); //vluzacn
 
-		if ((skin != -16) &&
+		if ((skin != CONTENTS_HINT) && //xWhitey
 			(
 				!strcmp(entclassname, "env_bubbles")
 				|| !strcmp(entclassname, "func_illusionary")
@@ -1527,7 +1527,8 @@ static void     Usage()
 	Log("    -console #       : Set to 0 to turn off the pop-up console (default is 1)\n");
 	Log("    -lang file       : localization file\n");
     Log("    -nowadtextures   : Include all used textures into bsp\n");
-    Log("    -wadinclude file : Include specific wad or directory into bsp\n");
+	Log("    -wadinclude file : Include specific wad or directory into bsp\n");
+	Log("    -wadreplace f f2 : Replace wad file [f] textures with textures from wad file [f2]\n");
     Log("    -noclip          : don't create clipping hull\n");
     
     Log("    -clipeconomy     : turn clipnode economy mode on\n");
@@ -1749,8 +1750,10 @@ int             main(const int argc, char** argv)
     // Hard coded list of -wadinclude files, used for HINT texture brushes so lazy
     // mapmakers wont cause beta testers (or possibly end users) to get a wad 
     // error on zhlt.wad etc
-	g_WadInclude.push_back("sdhlt.wad"); //seedee
+	//g_WadInclude.push_back("sdhlt.wad"); //seedee //not used from now --xWhitey
+	g_WadInclude.push_back("xwhtREP.wad"); //xWhitey
 	g_WadInclude.push_back("xwhtHLT.wad"); //xWhitey
+    g_WadReplace.push_back(WadReplace_t{ "xwhtHLT.wad", "xwhtREP.wad" });
 
 	InitDefaultHulls ();
 
@@ -1919,6 +1922,17 @@ int             main(const int argc, char** argv)
                 Usage();
             }
         }
+		else if (!strcasecmp(argv[i], "-wadreplace"))
+		{
+			if (i + 2 < argc)
+			{
+				g_WadReplace.push_back(WadReplace_t{ argv[++i], argv[++i] });
+			}
+			else
+			{
+				Usage();
+			}
+		}
         else if (!strcasecmp(argv[i], "-texdata"))
         {
             if (i + 1 < argc)	//added "1" .--vluzacn

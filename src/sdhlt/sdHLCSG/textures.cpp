@@ -1,5 +1,4 @@
 #include "csg.h"
-#include <vector>
 
 #define MAXWADNAME 16
 #define MAX_TEXFILES 128
@@ -33,6 +32,8 @@ typedef struct
 } lumpinfo_t;
 
 std::deque< std::string > g_WadInclude;
+
+std::vector< WadReplace_t > g_WadReplace; // --xWhitey
 
 static int      nummiptex = 0;
 static lumpinfo_t miptex[MAX_MAP_TEXTURES];
@@ -386,7 +387,7 @@ lumpinfo_t*     FindTexture(const lumpinfo_t* const source)
         Warning("::FindTexture() texture %s not found!", source->name);
         if (!strcmp(source->name, "NULL") || !strcmp (source->name, "SKIP"))
         {
-            Log("Are you sure you included sdhlt.wad in your wadpath list?\n");
+            Log("Are you sure you included xwhtHLT.wad in your wadpath list?\n");
         }
     }
 
@@ -416,14 +417,37 @@ lumpinfo_t*     FindTexture(const lumpinfo_t* const source)
 			{
 				wadpath_t *found_wadpath = texwadpathes[found->iTexFile];
 				wadpath_t *best_wadpath = texwadpathes[best->iTexFile];
-				if (found_wadpath->usedbymap != best_wadpath->usedbymap)
+
+				bool bRuleApplied = false;
+				for (const auto& rule : g_WadReplace)
 				{
-					better = !found_wadpath->usedbymap; // included wad is better
+					if (stristr(best_wadpath->path, rule.original.c_str()) &&
+						stristr(found_wadpath->path, rule.replacement.c_str()))
+					{
+						better = true;
+						bRuleApplied = true;
+						break;
+					}
+					if (stristr(found_wadpath->path, rule.original.c_str()) &&
+						stristr(best_wadpath->path, rule.replacement.c_str()))
+					{
+						better = false;
+						bRuleApplied = true;
+						break;
+					}
 				}
-				else
-				{
-					better = found->iTexFile < best->iTexFile; // upper in the wad list is better
-				}
+
+                if (!bRuleApplied)
+                {
+					if (found_wadpath->usedbymap != best_wadpath->usedbymap)
+					{
+						better = !found_wadpath->usedbymap; // included wad is better
+					}
+					else
+					{
+						better = found->iTexFile < best->iTexFile; // upper in the wad list is better
+					}
+                }
 			}
 			else if (found->filepos != best->filepos)
 			{

@@ -189,8 +189,8 @@ typedef enum
     CONTENTS_CURRENT_UP = -13,
     CONTENTS_CURRENT_DOWN = -14,
 
-    CONTENTS_TRANSLUCENT = -15,
-    CONTENTS_HINT = -16,     // Filters down to CONTENTS_EMPTY by bsp, ENGINE SHOULD NEVER SEE THIS
+	CONTENTS_TRANSLUCENT = -15,
+	CONTENTS_HINT = -16,     // Filters down to CONTENTS_EMPTY by bsp, ENGINE SHOULD NEVER SEE THIS
 
     CONTENTS_NULL = -17,     // AJM  // removed in csg and bsp, VIS or RAD shouldnt have to deal with this, only clip planes!
 
