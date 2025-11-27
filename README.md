@@ -14,10 +14,10 @@ New features include shadows from studiomodels, new entities, additional tool te
 ## How to install
 
 1. Open the configuration dialog of your map editor or batch compiler.
-2. Set CSG, BSP, VIS, RAD tool paths to *sdHLCSG.exe*, *sdHLBSP.exe*, *sdHLVIS.exe*, *sdHLRAD.exe*, use the *_x64.exe* editions if running on 64-bit.  
-3. Add *sdhlt.wad* into your wad list. This is required to compile maps.
-3. Add *xwhtHLT.wad* into your wad list. This is required as well to compile maps.
-4. Add *sdhlt.fgd* into your fgd list.
+2. Set CSG, BSP, VIS, RAD tool paths to *sdHLCSG.exe*, *sdHLBSP.exe*, *sdHLVIS.exe*, *sdHLRAD.exe*, use the *_x64.exe* editions if running on 64-bit.
+3. Add *xwhtHLT.wad* into your wad list. This is required to compile maps. !!!Make sure it is the first .wad file your map uses!!!
+4. Add *xwhtREP.wad* into your wad list. This is required as well to compile maps. !!!Make sure it goes AFTER *xwhtHLT.wad*!!!
+5. Add *sdhlt.fgd* into your fgd list.
 
 The main benefit of the 64-bit version is no memory allocation failures, because the 64-bit tools have access to more than 2GB of system memory.
 
@@ -37,6 +37,10 @@ To implement these into your own fgd file for SmartEdit, use the template at the
 - *info_portal* and *info_leaf* ared used to create a portal from the leaf the *info_portal* is inside, to the selected leaf the *info_leaf* is inside. Forces target leaf to be visible from the current one, making all entities visible.
 - *info_minlights* used to set minlights for textures, works on world geometry too. Works similarly to `_minlight` but per-texture.
 
+### Wad replacement
+
+- New HLCSG compile parameter `-wadreplace file1 file2` allows you to replace textures from file1.wad to file2.wad, essentially allowing for a different look of a single texture in the map editor and in the game itself.
+
 ### Textures
 
 - Support for `%` texture flag, sets the minlight for this texture. **%texname** alone is equivalent to `_minlight 1.0`, while **%`#`texname** where **`#`** is an integer in a range of `0-255`.
@@ -49,6 +53,10 @@ To implement these into your own fgd file for SmartEdit, use the template at the
 - **DETAILCUTLVL** texture family, which acts like **func_detail** fully. They don't seal the map, nor block VIS. Sets **detaillevel** for the brush it's applied on to accordingly to the texture's name.
 - **NOCLIPDETAILCUT** texture, which acts like **DETAILCUT** and **NOCLIP** together.
 - **NCDETAILCUTLVL** texture family, which acts like **DETAILCUTLVL** and **NOCLIP** together.
+- **CLIPHULLTRIGGER** texture, which acts like CLIPHULL1, CLIPHULL3 and AAATRIGGER together. This very tool texture generates clipnodes only for HULL1 and HULL3, useful on very large and detailed maps which can't use `-nohull2` for a reason. Can be used instead of AAATRIGGER, but large entities as like bullsquids, gonarch won't be able to touch the brush with this texture applied on to.
+- **black** texture, was seen before but got a better look. In the game, it will look normal, though.
+- **black_HIDDEN** texture, was seen before but got a better look as well. In the game, it will look normal, though.
+- **sky** texture, was seen before but got a better look as well.
 
 ### Compile parameters
 
