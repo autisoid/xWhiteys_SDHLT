@@ -310,9 +310,9 @@ static void ParseBrush(entity_t* mapent)
 				b->noclip = true;
 				b->dontcut = true;
 			}
-			if (!strncasecmp(g_token, "NCDETAILCUTLVL", 15)) {
+			if (!strncasecmp(g_token, "NCDETAILCUTLVL", 14)) {
 				strcpy(g_token, "NULL");
-				int h = atoi(&g_token[15]);
+				int h = atoi(&g_token[14]);
 				if (h < 0) {
 					Error("Invalid NCDETAILCUTLVL specified on Entity %i, Brush %i, Side %i: h is %d, expected h >= 0\n", b->originalentitynum, b->originalbrushnum,
 						b->numsides, h);
