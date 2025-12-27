@@ -59,10 +59,11 @@ static face_t* TryMerge(face_t* f1, face_t* f2)
     {
         return NULL;
     }
-    if (f1->dontcut != f2->dontcut)
-    {
-        return NULL;
-    }
+    // detailcut faces can be merged
+    //if (f1->dontcut != f2->dontcut)
+    //{
+    //    return NULL;
+    //}
 
     //
     // find a common edge

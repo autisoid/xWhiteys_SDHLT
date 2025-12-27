@@ -810,8 +810,8 @@ void LogWadUsage(wadpath_t *currentwad, int nummiptex)
 // =====================================================================================
 //  TexinfoForBrushTexture
 // =====================================================================================
-int             TexinfoForBrushTexture(const plane_t* const plane, brush_texture_t* bt, const vec3_t origin
-					)
+int             TexinfoForBrushTexture(const plane_t* const plane, brush_texture_t* bt, const vec3_t origin,
+					bool shouldhide, int entitynum)
 {
     vec3_t          vecs[2];
     int             sv, tv;
@@ -828,8 +828,11 @@ int             TexinfoForBrushTexture(const plane_t* const plane, brush_texture
     memset(&tx, 0, sizeof(tx));
 	FindMiptex (bt->name);
 
+    bool bAllowLightingWater = g_bAllowLightingWater && entitynum != 0;
+    bAllowLightingWater = bAllowLightingWater && IntForKey(&g_entities[entitynum], "zhlt_embedlightmap") != 0;
+
     // set the special flag
-    if (g_dontfixupliquidscheck? (bt->name[0] == '*'): (bt->name[0] == '!')
+    if (bAllowLightingWater? false: g_dontfixupliquidscheck? (bt->name[0] == '*'): (bt->name[0] == '!')
         || !strncasecmp(bt->name, "sky", 3)
 
 // =====================================================================================
@@ -847,6 +850,10 @@ int             TexinfoForBrushTexture(const plane_t* const plane, brush_texture
 		// actually only 'sky' and 'aaatrigger' needs this. --vluzacn
         tx.flags |= TEX_SPECIAL;
     }
+	if (shouldhide)
+	{
+		tx.flags |= TEX_SHOULDHIDE;
+	}
 
     if (bt->txcommand)
     {

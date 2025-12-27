@@ -10,7 +10,7 @@
 //#define MODIFICATIONS_STRING "Submit detailed bug reports to (amckern@yahoo.com)\n"
 //#define MODIFICATIONS_STRING "Submit detailed bug reports to (vluzacn@163.com)\n" //--vluzacn
 //#define MODIFICATIONS_STRING "Submit detailed bug reports to (github.com/seedee/SDHLT/issues)\n"
-#define MODIFICATIONS_STRING "Submit detailed bug reports to (github.com/autisoid/xwhtHLT/issues)\nBefore try out reproducing the same stuff in original SDHLT if possible.\nIf it does reproduce, instead, submit the bug report to (github.com/seedee/SDHLT/issues)\n"
+#define MODIFICATIONS_STRING "Submit detailed bug reports to (github.com/autisoid/xWhiteys_SDHLT/issues)\n"
 
 #ifdef _DEBUG
 #define ZHLT_VERSIONSTRING "v3.4 dbg"
@@ -22,7 +22,7 @@
 
 #define SDHLT_VERSIONSTRING "v1.2.0"
 
-#define XWHTHLT_VERSIONSTRING "v1.0.3-fix1"
+#define XWHTHLT_VERSIONSTRING "v1.0.4"
 
 #if !defined (SDHLCSG) && !defined (SDHLBSP) && !defined (SDHLVIS) && !defined (SDHLRAD) && !defined (SDRIPENT) //seedee
 #error "You must define one of these in the settings of each project: SDHLCSG, SDHLBSP, SDHLVIS, SDHLRAD, SDRIPENT. The most likely cause is that you didn't load the project from the .sln file."

@@ -886,8 +886,8 @@ bool            MakeBrushPlanes(brush_t* b)
         f->plane = &g_mapplanes[planenum];
         f->next = b->hulls[0].faces;
         b->hulls[0].faces = f;
-        f->texinfo = g_onlyents ? 0 : TexinfoForBrushTexture(f->plane, &s->td, origin
-						);
+        f->texinfo = g_onlyents ? 0 : TexinfoForBrushTexture(f->plane, &s->td, origin,
+						s->shouldhide, b->entitynum);
 		f->bevel = b->bevel || s->bevel;
     }
 
@@ -918,19 +918,15 @@ static contents_t TextureContents(const char* const name)
         return CONTENTS_SKY;
 // =====================================================================================
 
-    if (!strncasecmp(name + 1, "!lava", 5))
-        return CONTENTS_LAVA;
-
-    if (!strncasecmp(name + 1, "!slime", 6))
-        return CONTENTS_SLIME;
-    if (!strncasecmp(name, "!lava", 5))
-        return CONTENTS_LAVA;
-
-    if (!strncasecmp(name, "!slime", 6))
-        return CONTENTS_SLIME;
-
     if (name[0] == '!') //optimized -- don't check for current unless it's liquid (KGP)
 	{
+		// moved slime, lava checks under the liquid check and removed duplicate code --xWhitey
+		if (!strncasecmp(name + 1, "!lava", 5))
+			return CONTENTS_LAVA;
+
+		if (!strncasecmp(name + 1, "!slime", 6))
+			return CONTENTS_SLIME;
+
 		if (!strncasecmp(name, "!cur_90", 7))
 			return CONTENTS_CURRENT_90;
 		if (!strncasecmp(name, "!cur_0", 6))
@@ -963,19 +959,22 @@ static contents_t TextureContents(const char* const name)
 	if (!strncasecmp(name, "skip", 4))
 		return CONTENTS_TOEMPTY;
 
-    if (!strncasecmp(name, "translucent", 11))
-        return CONTENTS_TRANSLUCENT;
-
-    if (name[0] == '@')
+    if (!strncasecmp(name, "translucent", 11) || name[0] == '@') // or if the texture has @ prefix --xWhitey
         return CONTENTS_TRANSLUCENT;
 
 	if (!strncasecmp(name, "null", 4))
         return CONTENTS_NULL;
-	if(!strncasecmp(name,"bevel",5))
+	if (!strncasecmp(name, "bevel", 5))
 		return CONTENTS_NULL;
+
+	// detailcut tool texture --xWhitey
 	if (!strncasecmp(name, "detailcut", 9))
 		return CONTENTS_NULL;
 	if (!strncasecmp(name, "noclipdetailcut", 15))
+		return CONTENTS_NULL;
+	if (!strncasecmp(name, "detailcutlvl", 12))
+		return CONTENTS_NULL;
+	if (!strncasecmp(name, "ncdetailcutlvl", 14))
 		return CONTENTS_NULL;
 
     return CONTENTS_SOLID;

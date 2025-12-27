@@ -86,6 +86,7 @@ typedef struct face_s                                      // This structure is 
     int             contents;                              // contents in front of face
 	int             detaillevel; // defined by hlcsg
     int             dontcut;     // defined by hlcsg
+    int             subdividesize; // defined by hlcsg
 	int				*outputedges; // used in WriteDrawNodes
 
     struct face_s*  original;                              // face on node

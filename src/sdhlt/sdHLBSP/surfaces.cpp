@@ -32,6 +32,8 @@ void            SubdivideFace(face_t* f, face_t** prevptr)
     texinfo_t*      tex;
     vec3_t          temp;
 
+    int             subdividesize = f->subdividesize? f->subdividesize: g_subdivide_size; //--xWhitey
+
     // special (non-surface cached) faces don't need subdivision
 
 	if (f->texturenum == -1)
@@ -40,7 +42,7 @@ void            SubdivideFace(face_t* f, face_t** prevptr)
 	}
     tex = &g_texinfo[f->texturenum];
 
-    if (tex->flags & TEX_SPECIAL) 
+    if (tex->flags & TEX_SPECIAL) // don't subdivide special faces as these ignore "invalid surface extents" and are not lit --xWhitey
     {
         return;
     }
@@ -79,7 +81,7 @@ void            SubdivideFace(face_t* f, face_t** prevptr)
                 }
             }
 
-            if ((maxs - mins) <= g_subdivide_size)
+            if ((maxs - mins) <= subdividesize)
             {
                 break;
             }
@@ -91,7 +93,7 @@ void            SubdivideFace(face_t* f, face_t** prevptr)
             v = VectorNormalize(temp);
 
             VectorCopy(temp, plane.normal);
-            plane.dist = (mins + g_subdivide_size - TEXTURE_STEP) / v; //plane.dist = (mins + g_subdivide_size - 16) / v; //--vluzacn
+            plane.dist = (mins + subdividesize - TEXTURE_STEP) / v; //plane.dist = (mins + g_subdivide_size - 16) / v; //--vluzacn
             next = f->next;
             SplitFace(f, &plane, &front, &back);
             if (!front || !back)

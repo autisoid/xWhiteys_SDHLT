@@ -97,5 +97,19 @@ But the cost of that is weird lighting (look again into the outside screenshot I
 
 See these nice boxes? They're one single brush entity, but they don't "cut" each other (look into the map source to see why)
 
+## Lightmapped Water? What?
+
+- Yeeesss... Though it's dope.
+
+<img alt="lightmapped_water_ex_1" src="media/lightmapped_water_ex_1.png" />
+
+<img alt="lightmapped_water_ex_2" src="media/lightmapped_water_ex_2.png" />
+
+- For this to work, pass `-allowlightwater` to HLCSG and `-allowlightingwater` to HLRAD. (Note that the keys are DIFFERENT for RAD and CSG!!!)
+
+- Now, to set it up in the game, you have to set `zhlt_subdividesize` of your func_water to 64 and make sure your func_water brushes are aligned to 64 grid perfectly. Also, enable `zhlt_embedlightmap` and set `zhlt_embedlightmapresolution` to desired resolution. Make sure you don't have `-notextures` passed to HLRAD as this prevents it from embedding lightmaps.
+
+<img alt="lightmapped_water_jack_settings" src="media/lightmapped_water_jack_settings.png" />
+
 ## Planned
 Same as [this](https://github.com/seedee/SDHLT?tab=readme-ov-file#planned) but I don't really plan on implementing this at all.

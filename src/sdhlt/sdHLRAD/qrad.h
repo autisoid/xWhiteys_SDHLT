@@ -136,6 +136,7 @@
 	#define DEFAULT_BLUR 1.5 // classic lighting is equivalent to "-blur 1.0"
 	#define DEFAULT_NOEMITTERRANGE false
 	#define DEFAULT_BLEEDFIX true
+	#define DEFAULT_ALLOW_LIGHTING_WATER false
 	#define DEFAULT_EMBEDLIGHTMAP_POWEROFTWO true
 	#define DEFAULT_EMBEDLIGHTMAP_DENOMINATOR 188.0
 	#define DEFAULT_EMBEDLIGHTMAP_GAMMA 1.05
@@ -469,6 +470,7 @@ extern vec3_t	g_jitter_hack;
 	extern vec_t g_blur;
 	extern bool g_noemitterrange;
 	extern bool g_bleedfix;
+	extern bool g_bAllowLightingWater; // whether we allow embedding lightmaps into water brushes --xWhitey
 	extern vec_t g_maxdiscardedlight;
 	extern vec3_t g_maxdiscardedpos;
 	extern vec_t g_texlightgap;

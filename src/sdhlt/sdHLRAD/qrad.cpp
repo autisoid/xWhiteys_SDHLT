@@ -107,6 +107,7 @@ bool g_notextures = DEFAULT_NOTEXTURES;
 vec_t g_texreflectgamma = DEFAULT_TEXREFLECTGAMMA;
 vec_t g_texreflectscale = DEFAULT_TEXREFLECTSCALE;
 bool g_bleedfix = DEFAULT_BLEEDFIX;
+bool g_bAllowLightingWater = DEFAULT_ALLOW_LIGHTING_WATER; // --xWhitey
 bool g_drawpatch = false;
 bool g_drawsample = false;
 vec3_t g_drawsample_origin = {0,0,0};
@@ -1316,6 +1317,7 @@ static void     MakePatchForFace(const int fn, Winding* w, int style
     const dface_t*  f = g_dfaces + fn;
 
     // No g_patches at all for the sky!
+	// and for water if that's worldbrush or an entity without zhlt_embedlightmap --xWhitey
     if (!IsSpecial(f))
     {
 		if (g_face_texlights[fn])
@@ -1429,6 +1431,24 @@ static void     MakePatchForFace(const int fn, Winding* w, int style
 					{ // with light_bounce
 						opacity = 1.0; // reflects light
 					}
+				}
+			}
+			// restore zhlt_hidden --xWhitey
+			// if the face is a world face and it's not referenced by any leaf, it must be a hidden face, and shouldn't reflect light
+			if (g_dmodels[0].firstface <= fn && fn < g_dmodels[0].firstface + g_dmodels[0].numfaces)
+			{
+				bool found = false;
+				for (int x = 0; x < g_nummarksurfaces; x++)
+				{
+					if (g_dmarksurfaces[x] == fn)
+					{
+						found = true;
+						break;
+					}
+				}
+				if (!found)
+				{
+					opacity = 0.0;
 				}
 			}
 			VectorScale (patch->texturereflectivity, opacity, patch->bouncereflectivity);
@@ -2992,6 +3012,7 @@ static void     Settings()
 	Log("blur size            [ %17s ] [ %17s ]\n", buf1, buf2);
 	Log("no emitter range     [ %17s ] [ %17s ]\n", g_noemitterrange ? "on" : "off", DEFAULT_NOEMITTERRANGE ? "on" : "off");
 	Log("wall bleeding fix    [ %17s ] [ %17s ]\n", g_bleedfix ? "on" : "off", DEFAULT_BLEEDFIX ? "on" : "off");
+	Log("allow lighting water [ %17s ] [ %17s ]\n", g_bAllowLightingWater ? "on" : "off", DEFAULT_ALLOW_LIGHTING_WATER ? "on" : "off");
 
     Log("\n\n");
 }
@@ -3897,6 +3918,10 @@ int             main(const int argc, char** argv)
 		else if (!strcasecmp (argv[i], "-nobleedfix"))
 		{
 			g_bleedfix = false;
+		}
+		else if (!strcasecmp (argv[i], "-allowlightingwater"))
+		{
+			g_bAllowLightingWater = true;
 		}
 		else if (!strcasecmp (argv[i], "-texlightgap"))
 		{

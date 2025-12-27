@@ -1059,8 +1059,15 @@ void EmbedLightmapInTextures ()
 		{
 			continue;
 		}
-		if (!strncmp (texname, "sky", 3)
-			|| originaltexinfo->flags & TEX_SPECIAL) // skip special surfaces
+		if (!strncmp (texname, "sky", 3)) // skip sky surfaces
+		{
+			continue;
+		}
+		if (!g_bAllowLightingWater && texname[0] == '!')
+		{
+			continue; // skip water, we're not allowed to light it
+		}
+		if (g_bAllowLightingWater && texname[0] == '!'? false: originaltexinfo->flags & TEX_SPECIAL) // skip special surface and water if g_bAllowLightingWater is FALSE
 		{
 			continue;
 		}
@@ -1311,7 +1318,7 @@ void EmbedLightmapInTextures ()
 				palettemaxcolors = 255;
 				VectorCopy (tex->palette[255], palette[255]); // the transparency color
 			}
-			/*else if (texname[0] == '!')
+			else if (texname[0] == '!' && g_bAllowLightingWater)
 			{
 				paletteoffset = 16; // because the 4th entry and the 5th entry are reserved for fog color and fog density
 				for (j = 0; j < 16; j++)
@@ -1319,7 +1326,7 @@ void EmbedLightmapInTextures ()
 					VectorCopy (tex->palette[j], palette[j]);
 				}
 				palettemaxcolors = 256 - 16;
-			}*/
+			}
 			else
 			{
 				paletteoffset = 0;
@@ -1431,10 +1438,10 @@ void EmbedLightmapInTextures ()
 		{
 			strcpy (miptex->name, "{_rad");
 		}
-		/*else if (texname[0] == '!')
+		else if (texname[0] == '!' && g_bAllowLightingWater) // --xWhitey
 		{
 			strcpy (miptex->name, "!_rad");
-		}*/
+		}
 		else
 		{
 			strcpy (miptex->name, "__rad");

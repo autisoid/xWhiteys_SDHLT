@@ -59,6 +59,7 @@
 #endif
 #define DEFAULT_NULLIFYTRIGGER true
 #define DEFAULT_DONTFIXUPLIQUIDSCHECK false
+#define DEFAULT_ALLOW_LIGHTING_WATER false
 
 // AJM: added in
 #define UNLESS(a)  if (!(a))
@@ -120,6 +121,7 @@ typedef struct side_s
 {
     brush_texture_t td;
 	bool			bevel;
+    bool            shouldhide; // don't generate marksurfaces for this brush so VIS marks it as never visible...
     vec_t           planepts[3][3];
 } side_t;
 
@@ -163,6 +165,7 @@ typedef struct brush_s
 	int				chopdown; // allow this brush to chop brushes of lower detail level
 	int				chopup; // allow this brush to be chopped by brushes of higher detail level
     bool            dontcut; // don't allow this brush to cut other brushes' faces
+    int             subdividesize; // overriden subdivide size
     bool            waterbrush; // special flag for water, similar to dontcut but it doesn't block vis nor create visportals
 	int				clipnodedetaillevel;
 	int				coplanarpriority;
@@ -249,8 +252,8 @@ extern std::vector< WadReplace_t > g_WadReplace;  // --xWhitey
 
 extern void     WriteMiptex();
 extern void     LogWadUsage(wadpath_t* currentwad, int nummiptex);
-extern int      TexinfoForBrushTexture(const plane_t* const plane, brush_texture_t* bt, const vec3_t origin
-					);
+extern int      TexinfoForBrushTexture(const plane_t* const plane, brush_texture_t* bt, const vec3_t origin,
+					bool shouldhide, int entitynum);
 extern const char *GetTextureByNumber_CSG(int texturenumber);
 
 //=============================================================================
@@ -292,6 +295,7 @@ extern bool g_noutf8;
 #endif
 extern bool g_nullifytrigger;
 extern bool g_dontfixupliquidscheck;
+extern bool g_bAllowLightingWater;
 
 extern vec_t    g_tiny_threshold;
 extern vec_t    g_BrushUnionThreshold;

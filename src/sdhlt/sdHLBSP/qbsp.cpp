@@ -213,6 +213,7 @@ face_t*         NewFaceFromFace(const face_t* const in)
 	newf->facestyle = in->facestyle;
 	newf->detaillevel = in->detaillevel;
     newf->dontcut = in->dontcut;
+    newf->subdividesize = in->subdividesize;
 
     return newf;
 }
@@ -961,7 +962,7 @@ static surfchain_t* ReadSurfs(FILE* file)
 {
     int             r;
 	int				detaillevel;
-    int             planenum = 0, g_texinfo = 0, contents = 0, numpoints = 0, dontcut = 0;
+    int             planenum = 0, g_texinfo = 0, contents = 0, numpoints = 0, dontcut = 0, subdividesize = 0;
     face_t*         f;
     int             i;
     double          v[3];
@@ -975,7 +976,7 @@ static surfchain_t* ReadSurfs(FILE* file)
         if (file == polyfiles[2] && g_nohull2)
             break;
         line++;
-        r = fscanf(file, "%i %i %i %i %u %i\n", &detaillevel, &planenum, &g_texinfo, &contents, &numpoints, &dontcut);
+        r = fscanf(file, "%i %i %i %i %u %i %i\n", &detaillevel, &planenum, &g_texinfo, &contents, &numpoints, &dontcut, &subdividesize);
         if (r == 0 || r == -1)
         {
             return NULL;
@@ -985,7 +986,7 @@ static surfchain_t* ReadSurfs(FILE* file)
             Developer(DEVELOPER_LEVEL_MEGASPAM, "inaccuracy: average %.8f max %.8f\n", inaccuracy_total / inaccuracy_count, inaccuracy_max);
             break;
         }
-        if (r != 6)
+        if (r != 7) // Bruh. I don't like that I'm growing this shit up drastically --xWhitey
         {
             Error("ReadSurfs (line %i, hull %i): scanf failure", line, hullnum);
         }
@@ -1026,6 +1027,7 @@ static surfchain_t* ReadSurfs(FILE* file)
 
         f = AllocFace();
         f->dontcut = dontcut;
+        f->subdividesize = subdividesize;
         f->detaillevel = detaillevel;
         f->planenum = planenum;
         f->texturenum = g_texinfo;

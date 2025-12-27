@@ -1509,8 +1509,8 @@ static bool     CalcNodeBounds(node_t* node
 	}
 	for (i = 0; i < 3; i++)
 	{
-		validmins[i] = qmax (node->mins[i], -(ENGINE_ENTITY_RANGE + g_maxnode_size));
-		validmaxs[i] = qmin (node->maxs[i], ENGINE_ENTITY_RANGE + g_maxnode_size);
+		validmins[i] = qmax (node->mins[i], -(BOGUS_RANGE + g_maxnode_size));
+		validmaxs[i] = qmin (node->maxs[i], BOGUS_RANGE + g_maxnode_size);
 	}
 	for (i = 0; i < 3; i++)
 	{

@@ -70,6 +70,7 @@ bool g_noutf8 = DEFAULT_NOUTF8;
 #endif
 bool g_nullifytrigger = DEFAULT_NULLIFYTRIGGER;
 bool g_dontfixupliquidscheck = DEFAULT_DONTFIXUPLIQUIDSCHECK;
+bool g_bAllowLightingWater = DEFAULT_ALLOW_LIGHTING_WATER;
 bool g_viewsurface = false;
 
 // =====================================================================================
@@ -291,6 +292,7 @@ void            FreeFace(bface_t* f)
 void            WriteFace(const int hull, const bface_t* const f
 						  , int detaillevel
                           , int dontcut
+                          , int subdividesize
                           )
 {
     unsigned int    i;
@@ -304,7 +306,7 @@ void            WriteFace(const int hull, const bface_t* const f
     w = f->w;
 
     // plane summary
-	fprintf (out[hull], "%i %i %i %i %u %i\n", detaillevel, f->planenum, f->texinfo, f->contents, w->m_NumPoints, dontcut);
+	fprintf (out[hull], "%i %i %i %i %u %i %i\n", detaillevel, f->planenum, f->texinfo, f->contents, w->m_NumPoints, dontcut, subdividesize);
 
     // for each of the points on the face
     for (i = 0; i < w->m_NumPoints; i++)
@@ -513,7 +515,8 @@ static void     SaveOutside(const brush_t* const b, const int hull, bface_t* out
 			, 
 			(hull? b->clipnodedetaillevel: b->detaillevel)
             ,
-            b->dontcut
+            b->dontcut,
+            b->subdividesize
             );
 
         //              if (mirrorcontents != CONTENTS_SOLID)
@@ -534,7 +537,8 @@ static void     SaveOutside(const brush_t* const b, const int hull, bface_t* out
 				, 
 				(hull? b->clipnodedetaillevel: b->detaillevel)
                 ,
-                b->dontcut
+                b->dontcut,
+                b->subdividesize
                 );
         }
 
@@ -1445,7 +1449,7 @@ static void     ProcessModels()
         // write end of model marker
         for (j = 0; j < NUM_HULLS; j++)
         {
-			fprintf (out[j], "-1 -1 -1 -1 -1 -1\n");
+			fprintf (out[j], "-1 -1 -1 -1 -1 -1 -1\n");
 			fprintf (out_detailbrush[j], "-1\n");
         }
     }
@@ -1569,7 +1573,9 @@ static void     Usage()
 	Log("    -notextconvert   : don't convert game_text message from Windows ANSI to UTF8 format\n");
 #endif
 
-    Log("    -dontfixliquids  : don't fixup broken liquids check in TexinfoForBrushTexture. Adding this to cmdline results in liquids having a lightmap.\n");
+	Log("    -dontfixliquids  : don't fixup broken liquids check in TexinfoForBrushTexture. Adding this to cmdline results in liquids with ! prefix having a lightmap.\n");
+
+	Log("    -allowlightwater : don't apply TEX_SPECIAL to water.\n");
 
     Log("    -dev #           : compile with developer message\n\n");
 
@@ -2073,6 +2079,10 @@ int             main(const int argc, char** argv)
         else if (!strcasecmp (argv[i], "-dontfixliquids"))
         {
             g_dontfixupliquidscheck = true;
+        }
+        else if (!strcasecmp(argv[i], "-allowlightwater"))
+        {
+            g_bAllowLightingWater = true;
         }
         else if (argv[i][0] == '-')
         {

@@ -164,10 +164,15 @@ static void ParseBrush(entity_t* mapent)
     b->brushnum = g_nummapbrushes - mapent->firstbrush - 1; //Calculate the brush number within the current entity.
     b->noclip = 0; //Initialize false for now
 	b->dontcut = 0; //Initialize false for now
+	b->subdividesize = 0; //Initialize false for now
 
 	if (IntForKey(mapent, "zhlt_noclip")) //If zhlt_noclip
 	{
 		b->noclip = 1;
+	}
+	if (*ValueForKey(mapent, "zhlt_subdividesize")) //--xWhitey
+	{
+		b->subdividesize = IntForKey(mapent, "zhlt_subdividesize");
 	}
 	b->cliphull = 0;
 	b->bevel = false;
@@ -238,8 +243,9 @@ static void ParseBrush(entity_t* mapent)
         g_numbrushsides++; //Global brush side counter
         b->numsides++; //Number of sides for the current brush
 		side->bevel = false;
-        // read the three point plane definition
+		side->shouldhide = false; // restore zhlt_hidden --xWhitey
 
+        // read the three point plane definition 
         for (i = 0; i < 3; i++) //Read 3 point plane definition for brush side
         {
             if (i != 0) //If not the first point get next token
@@ -987,6 +993,19 @@ bool            ParseMapEntity()
 		|| !strcmp("func_detail", ValueForKey (mapent, "classname"))
 		)
     {
+		if (IntForKey(mapent, "zhlt_hidden"))
+		{
+			for (int i = 0; i < mapent->numbrushes; i++)
+			{
+				brush_t* b = &g_mapbrushes[mapent->firstbrush + i];
+				for (int j = 0; j < b->numsides; j++)
+				{
+					side_t* s = &g_brushsides[b->firstside + j];
+					s->shouldhide = true;
+				}
+			}
+		}
+
         // this is pretty gross, because the brushes are expected to be
         // in linear order for each entity
         brush_t*        temp;
@@ -1037,18 +1056,18 @@ bool            ParseMapEntity()
 		DeleteCurrentEntity (mapent);
 		return true;
 	}
-	/*if (fabs(mapent->origin[0]) > ENGINE_ENTITY_RANGE + ON_EPSILON ||
-		fabs (mapent->origin[1]) > ENGINE_ENTITY_RANGE + ON_EPSILON ||
-		fabs (mapent->origin[2]) > ENGINE_ENTITY_RANGE + ON_EPSILON )
+	if (fabs(mapent->origin[0]) > BOGUS_RANGE + ON_EPSILON ||
+		fabs (mapent->origin[1]) > BOGUS_RANGE + ON_EPSILON ||
+		fabs (mapent->origin[2]) > BOGUS_RANGE + ON_EPSILON )
 	{
 		const char *classname = ValueForKey (mapent, "classname");
 		if (strncmp (classname, "light", 5))
 		{
 			Warning ("Entity %i (classname \"%s\"): origin outside +/-%.0f: (%.0f,%.0f,%.0f)", 
 				g_numparsedentities, 
-				classname, (double)ENGINE_ENTITY_RANGE, mapent->origin[0], mapent->origin[1], mapent->origin[2]);
+				classname, (double)BOGUS_RANGE, mapent->origin[0], mapent->origin[1], mapent->origin[2]);
 		}
-	}*/
+	}
     return true;
 }
 

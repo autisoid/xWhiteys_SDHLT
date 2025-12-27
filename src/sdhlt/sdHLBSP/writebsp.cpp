@@ -251,11 +251,15 @@ static int		WriteDrawLeaf (node_t *node, const node_t *portalleaf)
 				{
 					ishidden = true;
 				}
+				if (f->texturenum >= 0 && (g_texinfo[f->texturenum].flags & TEX_SHOULDHIDE))
+				{
+					ishidden = true;
+				}
 			}
 			if (ishidden)
 			{
 				f = f->original;
-				continue;
+				continue; // don't emit a marksurface if HIDDEN --xWhitey
 			}
             g_dmarksurfaces[g_nummarksurfaces] = f->outputnumber;
             hlassume(g_nummarksurfaces < MAX_MAP_MARKSURFACES, assume_MAX_MAP_MARKSURFACES);
@@ -829,6 +833,11 @@ void            FinishBSPFile()
 		free (brinkinfo);
 		free (headnode);
 		free (clipnodes);
+	}
+
+	for (int i = 0; i < g_numtexinfo; i++)
+	{
+		g_texinfo[i].flags &= ~TEX_SHOULDHIDE;
 	}
 	
 #ifdef PLATFORM_CAN_CALC_EXTENT

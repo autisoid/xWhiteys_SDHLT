@@ -87,7 +87,7 @@
 #define TEXTURE_STEP        16 // this constant was previously defined in lightmap.cpp. --vluzacn
 #define MAX_SURFACE_EXTENT  16 // if lightmap extent exceeds 16, the map will not be able to load in 'Software' renderer and HLDS. //--vluzacn
 
-#define ENGINE_ENTITY_RANGE 4096.0
+#define ENGINE_ENTITY_RANGE g_iWorldExtent // -worldextent --xWhitey
 //=============================================================================
 
 #define BSPVERSION  30
@@ -229,6 +229,7 @@ typedef struct texinfo_s
 texinfo_t;
 
 #define TEX_SPECIAL     1                                  // sky or slime or null, no lightmap or 256 subdivision
+#define TEX_SHOULDHIDE  16384 // this flag is temporary; it might be set after CSG, but will be dropped after BSP
 
 // note that edge 0 is never used, because negative edge nums are used for
 // counterclockwise use of the edge in a face
