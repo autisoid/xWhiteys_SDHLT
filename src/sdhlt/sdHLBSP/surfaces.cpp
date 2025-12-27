@@ -34,6 +34,21 @@ void            SubdivideFace(face_t* f, face_t** prevptr)
 
     int             subdividesize = f->subdividesize? f->subdividesize: g_subdivide_size; //--xWhitey
 
+	if (subdividesize > MAX_SUBDIVIDE_SIZE)
+	{
+		Warning
+		("Maximum value for subdivide size is %i, 'zhlt_subdividesize %i' ignored",
+			MAX_SUBDIVIDE_SIZE, subdividesize);
+        subdividesize = MAX_SUBDIVIDE_SIZE;
+	}
+	else if (subdividesize < MIN_SUBDIVIDE_SIZE)
+	{
+		Warning
+		("Mininum value for subdivide size is %i, 'zhlt_subdividesize %i' ignored",
+			MIN_SUBDIVIDE_SIZE, subdividesize);
+        subdividesize = MIN_SUBDIVIDE_SIZE; //MAX_SUBDIVIDE_SIZE; //--vluzacn
+	}
+
     // special (non-surface cached) faces don't need subdivision
 
 	if (f->texturenum == -1)
