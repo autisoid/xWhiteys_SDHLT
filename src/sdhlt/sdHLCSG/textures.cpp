@@ -167,6 +167,8 @@ static int      FindMiptex(const char* const name)
     return i;
 }
 
+#include <Windows.h>
+
 // =====================================================================================
 //  TEX_InitFromWad
 // =====================================================================================
@@ -330,7 +332,7 @@ bool            TEX_InitFromWad()
                 const std::string& texName = std::get<0>(texture);
                 char* szWadFileName = std::get<1>(texture);
                 int texLumps = std::get<2>(texture);
-                Log("[%s] %s (%d)\n", szWadFileName, texName, texLumps);
+                Log("[%s] %s (%d)\n", szWadFileName, texName.c_str(), texLumps);
             }
             Log("---------------------------------\n\n");
 		}
@@ -343,13 +345,10 @@ bool            TEX_InitFromWad()
 
             for (const auto& texture : texturesOversized)
             {
-                for (const auto& texture : texturesOversized)
-                {
-                    const std::string& texName = std::get<0>(texture);
-                    char* szWadFileName = std::get<1>(texture);
-                    int texBytes = std::get<2>(texture);
-                    Log("[%s] %s (%d bytes)\n", szWadFileName, texName, texBytes);
-                }
+                const std::string& texName = std::get<0>(texture);
+                char* szWadFileName = std::get<1>(texture);
+                int texBytes = std::get<2>(texture);
+                Log("[%s] %s (%d bytes)\n", szWadFileName, texName.c_str(), texBytes);
             }
             Log("----------------------------------------------------\n");
         }
