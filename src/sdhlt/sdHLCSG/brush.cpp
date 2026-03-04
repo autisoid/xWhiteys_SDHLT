@@ -902,8 +902,10 @@ static contents_t TextureContents(const char* const name)
 {
 	if (!strncasecmp(name, "contentsolid", 12))
 		return CONTENTS_SOLID;
-	if (!strncasecmp(name, "contentwater", 12))
+	if (!strncasecmp(name, "contentwater", 12))	// --xWhitey
 		return CONTENTS_WATER;
+	if (!strncasecmp(name, "contentskipwtr", 14))
+		return CONTENTS_TOEMPTYWATER;
 	if (!strncasecmp(name, "contentempty", 12))
 		return CONTENTS_TOEMPTY;
 	if (!strncasecmp(name, "contentsky", 10))
@@ -1023,7 +1025,7 @@ const char*     ContentsToString(const contents_t type)
     case CONTENTS_NULL:
         return "NULL";
 
-
+	case CONTENTS_TOEMPTYWATER:
 	case CONTENTS_TOEMPTY:
 		return "EMPTY";
 
@@ -1143,6 +1145,7 @@ contents_t      CheckBrushContents(const brush_t* const b)
 		case CONTENTS_BOUNDINGBOX:
 		case CONTENTS_HINT:
 		case CONTENTS_TOEMPTY:
+		case CONTENTS_TOEMPTYWATER:
             break;
         default:
             Fatal(assume_BRUSH_NOT_ALLOWED_IN_ENTITY, "Entity %i, Brush %i: %s brushes not allowed in entity", 
@@ -1181,7 +1184,7 @@ void CreateBrush(const int brushnum) //--vluzacn
 
 	if (contents == CONTENTS_HINT)
 		return;
-	if (contents == CONTENTS_TOEMPTY)
+	if (contents == CONTENTS_TOEMPTY || contents == CONTENTS_TOEMPTYWATER)
 		return;
 
 	if (g_noclip)

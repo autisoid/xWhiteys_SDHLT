@@ -648,7 +648,7 @@ static void ParseBrush(entity_t* mapent)
 			strcpy (side->td.name, "NULL");
 		}
 	}
-	if (b->cliphull != 0 && b->contents == CONTENTS_TOEMPTY)
+	if (b->cliphull != 0 && (b->contents == CONTENTS_TOEMPTY || b->contents == CONTENTS_TOEMPTYWATER) )
 	{
 		// check for mix of CLIP and normal texture
 		bool mixed = false;

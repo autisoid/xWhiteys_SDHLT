@@ -383,7 +383,7 @@ static void     SaveOutside(const brush_t* const b, const int hull, bface_t* out
 		int texinfo = f->texinfo;
 		const char *texname = GetTextureByNumber_CSG (texinfo);
 		frontcontents = f->contents;
-		if (mirrorcontents == CONTENTS_TOEMPTY)
+		if (mirrorcontents == CONTENTS_TOEMPTY || mirrorcontents == CONTENTS_TOEMPTYWATER)
 		{
 			backcontents = f->backcontents;
 		}
@@ -398,6 +398,15 @@ static void     SaveOutside(const brush_t* const b, const int hull, bface_t* out
 		if (backcontents == CONTENTS_TOEMPTY)
 		{
 			backcontents = CONTENTS_EMPTY;
+		}
+        // xWhitey: CONTENTSKIPWTR
+		if (frontcontents == CONTENTS_TOEMPTYWATER)
+		{
+			frontcontents = CONTENTS_WATER;
+		}
+		if (backcontents == CONTENTS_TOEMPTYWATER)
+		{
+			backcontents = CONTENTS_WATER;
 		}
 
 		bool frontnull, backnull;
@@ -670,6 +679,7 @@ static void     CSGBrush(int brushnum)
 			case CONTENTS_BOUNDINGBOX:
 			case CONTENTS_HINT:
 			case CONTENTS_TOEMPTY:
+			case CONTENTS_TOEMPTYWATER:
 				break;
 			default:
 				Error ("Entity %i, Brush %i: %s brushes not allowed in detail\n", 
@@ -693,6 +703,14 @@ static void     CSGBrush(int brushnum)
 				f->backcontents = CONTENTS_TOEMPTY;
 			}
 		}
+        if (b1->contents == CONTENTS_TOEMPTYWATER)
+        {
+			for (f = outside; f; f = f->next)
+			{
+				f->contents = CONTENTS_TOEMPTYWATER;
+				f->backcontents = CONTENTS_TOEMPTYWATER;
+			}
+        }
 
         // for each brush in entity e
         for (bn = 0; bn < e->numbrushes; bn++)
@@ -706,7 +724,7 @@ static void     CSGBrush(int brushnum)
 
             b2 = &g_mapbrushes[e->firstbrush + bn];
             bh2 = &b2->hulls[hull];
-			if (b2->contents == CONTENTS_TOEMPTY)
+			if (b2->contents == CONTENTS_TOEMPTY || b2->contents == CONTENTS_TOEMPTYWATER)
 				continue;
 			if (
 				(hull? (b2->clipnodedetaillevel - 0 > b1->clipnodedetaillevel + 0): (b2->detaillevel - b2->chopdown > b1->detaillevel + b1->chopup))
@@ -901,7 +919,7 @@ static void     CSGBrush(int brushnum)
 						FreeFace (f);
 						continue;
 					}
-					if (b1->contents == CONTENTS_TOEMPTY)
+					if (b1->contents == CONTENTS_TOEMPTY || b1->contents == CONTENTS_TOEMPTYWATER)
 					{
 						bool onfront = true, onback = true;
 						for (f2 = bh2->faces; f2; f2 = f2->next)

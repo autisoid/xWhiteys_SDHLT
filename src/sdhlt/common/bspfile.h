@@ -198,6 +198,7 @@ typedef enum
 	CONTENTS_BOUNDINGBOX = -19, // similar to CONTENTS_ORIGIN
 
 	CONTENTS_TOEMPTY = -32,
+    CONTENTS_TOEMPTYWATER = -33,
 }
 contents_t;
 
